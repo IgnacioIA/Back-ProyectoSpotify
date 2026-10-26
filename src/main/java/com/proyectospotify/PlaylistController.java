@@ -1,4 +1,4 @@
-package com.proyectospotify;
+﻿package com.proyectospotify;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -55,4 +55,13 @@ public class PlaylistController {
         ).orElse(ResponseEntity.notFound().build());
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarPlaylist(@PathVariable Long id) {
+        return playlistRepository.findById(id)
+                .map(playlist -> {
+                    playlistRepository.delete(playlist);
+                    return ResponseEntity.noContent().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
