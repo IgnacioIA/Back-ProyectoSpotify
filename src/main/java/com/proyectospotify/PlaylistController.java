@@ -1,4 +1,4 @@
-﻿package com.proyectospotify;
+package com.proyectospotify;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +18,14 @@ public class PlaylistController {
     @Autowired
     private CancionRepository cancionRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     @GetMapping
-    public List<Playlist> obtenerTodas() {
+    public List<Playlist> obtenerTodas(@RequestParam(required = false) Long usuarioId) {
+        if (usuarioId != null) {
+            return playlistRepository.findByUsuarioId(usuarioId);
+        }
         return playlistRepository.findAll();
     }
 
@@ -31,9 +37,14 @@ public class PlaylistController {
     }
 
     @PostMapping
-    public Playlist crearPlaylist(@RequestBody Playlist playlist) {
+    public Playlist crearPlaylist(@RequestBody Playlist playlist, @RequestParam(required = false) Long usuarioId) {
         if (playlist.getCanciones() == null) {
             playlist.setCanciones(new ArrayList<>());
+        }
+        if (usuarioId != null) {
+            usuarioRepository.findById(usuarioId).ifPresent(playlist::setUsuario);
+        } else if (playlist.getUsuario() != null && playlist.getUsuario().getId() != null) {
+            usuarioRepository.findById(playlist.getUsuario().getId()).ifPresent(playlist::setUsuario);
         }
         return playlistRepository.save(playlist);
     }

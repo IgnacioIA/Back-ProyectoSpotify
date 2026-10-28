@@ -17,19 +17,29 @@ public class HistorialController {
     @Autowired
     private CancionRepository cancionRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     @GetMapping
-    public List<Historial> obtenerHistorial() {
+    public List<Historial> obtenerHistorial(@RequestParam(required = false) Long usuarioId) {
+        if (usuarioId != null) {
+            return historialRepository.findByUsuarioId(usuarioId);
+        }
         return historialRepository.findAll();
     }
 
     @PostMapping("/reproducir/{cancionId}")
-    public ResponseEntity<Historial> registrarReproduccion(@PathVariable Long cancionId) {
+    public ResponseEntity<Historial> registrarReproduccion(
+            @PathVariable Long cancionId,
+            @RequestParam(required = false) Long usuarioId) {
         return cancionRepository.findById(cancionId)
                 .map(cancion -> {
                     Historial historial = new Historial(cancion);
+                    if (usuarioId != null) {
+                        usuarioRepository.findById(usuarioId).ifPresent(historial::setUsuario);
+                    }
                     Historial guardado = historialRepository.save(historial);
                     
-                    // Opcional: si también quieres actualizar la última reproducción en la canción
                     cancion.setUltimaReproduccion(guardado.getFechaReproduccion());
                     cancionRepository.save(cancion);
 

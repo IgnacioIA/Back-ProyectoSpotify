@@ -14,6 +14,10 @@ public class Playlist {
 
     private String nombre;
 
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+
     // Relación Muchos a Muchos con Cancion
     @ManyToMany
     @JoinTable(
@@ -30,6 +34,11 @@ public class Playlist {
         this.nombre = nombre;
     }
 
+    public Playlist(String nombre, Usuario usuario) {
+        this.nombre = nombre;
+        this.usuario = usuario;
+    }
+
     // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -37,7 +46,9 @@ public class Playlist {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+
     public List<Cancion> getCanciones() { return canciones; }
     public void setCanciones(List<Cancion> canciones) { this.canciones = canciones; }
 }
-
